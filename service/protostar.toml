@@ -1,0 +1,77 @@
+# A FastAPI service: starter code with variables, a database choice, and
+# two tiers of tooling. Every tool listed here is still a switch for the
+# person using the template (--no-just, --docker, and so on).
+
+name = "Service"
+description = "FastAPI service with an optional Postgres database"
+version = "1.0.0"
+
+dependencies = ["fastapi", "uvicorn", "pydantic-settings"]
+directories = ["src/<% PACKAGE_NAME %>"]
+vcs_ignores = [".env"]
+
+# --- Tools both tiers share ---
+ruff = true
+just = true
+direnv = false
+docker = false
+
+# --- Tiers: how much tooling the service starts with ---
+tier = "production"
+
+[tiers.workbench]
+mypy = false
+pytest = false
+prek = false
+ci = false
+
+[tiers.production]
+mypy = true
+pytest = true
+prek = true
+ci = true
+
+# --- What the person using the template is asked ---
+[variables.SERVICE_PORT]
+description = "Port the service listens on, such as 8000"
+
+[options.database]
+description = "The database the service talks to."
+choices = ["none", "postgres"]
+default = "none"
+
+# --- Content that only applies sometimes ---
+[[optional]]
+requires = "database=postgres"
+dependencies = ["sqlalchemy", "psycopg[binary]"]
+files = ["src/<% PACKAGE_NAME %>/db.py", ".env.example"]
+
+[[optional]]
+requires = "pytest"
+# Starlette's TestClient runs requests through httpx2.
+dev_dependencies = ["httpx2"]
+files = ["tests/"]
+
+# --- pyproject.toml additions ---
+[dev.pyproject]
+# The service is an installable package, so tests import it like any consumer.
+build_system = '''
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/<% PACKAGE_NAME %>"]
+'''
+
+entrypoint = '''
+[project.scripts]
+<% PROJECT_NAME %> = "<% PACKAGE_NAME %>.app:main"
+'''
+
+[dev.pyproject.strict_typing]
+requires = "mypy"
+content = '''
+[tool.mypy]
+strict = true
+'''

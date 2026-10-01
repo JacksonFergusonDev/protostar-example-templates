@@ -1,0 +1,16 @@
+name = "Service"
+description = "Our team's FastAPI service"
+
+dependencies = ["fastapi", "uvicorn"]
+
+ruff = true
+mypy = true
+pytest = true
+ci = true
+
+[dev.pyproject.strict_typing]
+requires = "mypy"
+content = '''
+[tool.mypy]
+strict = true
+'''
