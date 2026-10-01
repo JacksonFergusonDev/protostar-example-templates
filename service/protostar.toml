@@ -4,7 +4,7 @@
 
 name = "Service"
 description = "FastAPI service with an optional Postgres database"
-version = "1.0.0"
+version = "1.1.0"
 
 dependencies = ["fastapi", "uvicorn", "pydantic-settings"]
 directories = ["src/<% PACKAGE_NAME %>"]
@@ -49,7 +49,7 @@ files = ["src/<% PACKAGE_NAME %>/db.py", ".env.example"]
 [[optional]]
 requires = "pytest"
 # Starlette's TestClient runs requests through httpx2.
-dev_dependencies = ["httpx2"]
+dev_dependencies = ["httpx2", "pytest-cov"]
 files = ["tests/"]
 
 # --- pyproject.toml additions ---
@@ -67,6 +67,23 @@ packages = ["src/<% PACKAGE_NAME %>"]
 entrypoint = '''
 [project.scripts]
 <% PROJECT_NAME %> = "<% PACKAGE_NAME %>.app:main"
+'''
+
+[dev.pyproject.simplify]
+requires = "ruff"
+content = '''
+[tool.ruff.lint]
+extend-select = ["SIM"]
+'''
+
+[dev.pyproject.coverage]
+requires = "pytest"
+content = '''
+[tool.coverage.run]
+branch = true
+
+[tool.coverage.report]
+show_missing = true
 '''
 
 [dev.pyproject.strict_typing]
